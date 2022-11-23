@@ -101,12 +101,45 @@ def do_super_scales(scale):
         scale = do_strings(scale)
     return [scale[:i]+"1"+scale[(i+1):] for i in find_all(scale,"0")]
 
+def do_n_mode(scale,n):
+    """Generates the n-th mode of the given scale"""
+    if type(scale) != str:
+        scale = do_strings(scale)
+    i = find_all(scale,"1")[n]
+    return scale[i:]+scale[:i]
+
+def do_all_modes(scale):
+    """Generates all modes of the given scale"""
+    if type(scale) != str:
+        scale = do_strings(scale)
+    return [scale[i:]+scale[:i] for i in find_all(scale,"1")]
+
+def generate_hepta_bas(c=True):
+    """Generates all modes of basic heptatonics"""
+    hpt_bas = {"Mn":"101011010101","MM":"101011011001",
+                "ma":"101101011001","mm":"101101010101",
+                "np":"110101010101","da":"110011011001"}
+    hpt_bas_colors = {"MM":"black","Mn":"green",
+                    "ma":"orange","mm":"pink",
+                    "np":"purple","da":"cyan"}
+    if c:
+        return {k:{"modes":do_all_modes(v),"color":hpt_bas_colors[k]}
+                for k,v in hpt_bas.items()}
+    else:
+        return {k:do_all_modes(v) for k,v in hpt_bas.items()}
+
 def do_sub_scales(scale):
     """Generates list of all sub scales (with one note less) 
     from a given scale"""
     if type(scale) != str:
         scale = do_strings(scale)
     return [scale[:i]+"0"+scale[(i+1):] for i in find_all(scale,"1")]
+
+def is_mode(s1,s2):
+    """Finds out wheter scale s1 is a mode of scale s2"""
+    if type(s1) != str or type(s2) != str:
+        s1, s2 = do_strings(s1), do_strings(s2)
+    return s1 in do_all_modes(s2)
 
 def do_ring_graph(df):
     """Generates a networkx graph from a pandas dataframe df
@@ -138,4 +171,4 @@ def plot_graph_notebook(g, l = None, name = "graph",
     if l: net = change_color(net, l)
     if save: net.save_graph("{}.html".format(name))
     #if show: net.show("{}.html".format(name))
-    if show: display(HTML("{}.html".format(name)))   
+    if show: display(HTML("{}.html".format(name)))
